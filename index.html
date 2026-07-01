@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>TransformX AI — #1 AI Fitness & Transformation Platform</title>
+  <meta name="description" content="AI-powered fitness, nutrition, body transformation and lifestyle platform. Personalized workout plans, Indian food tracking, and real results. Free to start.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .highlight-bar { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 36px; }
+    .highlight-item { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: var(--text-muted); font-weight: 600; }
+    .highlight-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+    .app-preview {
+      position: absolute; right: 5%; top: 50%; transform: translateY(-50%);
+      width: 420px; border-radius: 24px; overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(245,166,35,0.15), 0 0 80px rgba(245,166,35,0.08);
+      border: 1px solid rgba(245,166,35,0.2);
+    }
+    @media (max-width: 1100px) { .app-preview { display: none; } }
+    .how-it-works { padding: 80px 6%; background: var(--bg); }
+    .steps-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 48px; }
+    @media (max-width: 900px) { .steps-row { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .steps-row { grid-template-columns: 1fr; } }
+    .step-card { text-align: center; padding: 28px 16px; position: relative; }
+    .step-num {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--gold); color: var(--black);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; font-weight: 900;
+      margin: 0 auto 16px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em;
+    }
+    .step-card::after {
+      content: '→';
+      position: absolute; right: -12px; top: 36px;
+      font-size: 1.5rem; color: var(--gold); opacity: 0.4;
+    }
+    .step-card:last-child::after { display: none; }
+    @media (max-width: 900px) { .step-card::after { display: none; } }
+    .pricing-section { padding: 80px 6%; background: var(--bg-2); }
+    .pricing-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 36px; max-width: 460px; margin: 48px auto 0;
+      text-align: center; position: relative;
+    }
+    .pricing-badge {
+      position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+      background: var(--gold); color: var(--black);
+      padding: 4px 20px; border-radius: 999px;
+      font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+    }
+    .pricing-price { font-size: 4rem; font-weight: 900; color: var(--gold); line-height: 1; font-family: 'Bebas Neue', sans-serif; }
+    .pricing-features { list-style: none; text-align: left; margin: 24px 0; display: flex; flex-direction: column; gap: 10px; }
+    .pricing-features li { display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: var(--text-dim); }
+    .pricing-features li::before { content: '✓'; color: var(--gold); font-weight: 900; flex-shrink: 0; }
+    .scroll-reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .scroll-reveal.visible { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav class="landing-nav" id="mainNav">
+  <div class="landing-logo">
+    <div class="landing-logo-icon">⚡</div>
+    <div class="landing-logo-text">Transform<span>X AI</span></div>
+  </div>
+  <div class="landing-nav-links">
+    <a href="#features">Features</a>
+    <a href="#how-it-works">How It Works</a>
+    <a href="#results">Results</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <a href="auth.html" class="btn btn-ghost btn-sm" style="text-decoration:none;">Login</a>
+    <a href="auth.html" class="btn btn-primary btn-sm" style="text-decoration:none;">Start Free</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero-section" id="hero">
+  <div class="hero-bg">
+    <img src="img/hero.jpg" alt="TransformX AI Fitness" loading="eager">
+  </div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">India's #1 AI Fitness Platform</div>
+    <h1>Transform Your<br><span class="text-gold">Body. Mind. Life.</span></h1>
+    <p style="font-size:1.05rem;color:var(--text-dim);margin-top:20px;max-width:520px;line-height:1.8;">
+      The only fitness app that knows your life — your food, your schedule, your body. Personalized by AI. Built for results. Works with Indian food.
+    </p>
+    <div class="highlight-bar">
+      <div class="highlight-item"><div class="highlight-dot"></div>500+ Indian foods</div>
+      <div class="highlight-item"><div class="highlight-dot"></div>42 exercise guides</div>
+      <div class="highlight-item"><div class="highlight-dot"></div>Real AI coaching</div>
+      <div class="highlight-item"><div class="highlight-dot"></div>100% Free</div>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:32px;flex-wrap:wrap;">
+      <a href="auth.html" class="btn btn-primary btn-lg" style="text-decoration:none;">
+        ⚡ Start Your Transformation
+      </a>
+      <a href="#features" class="btn btn-outline btn-lg" style="text-decoration:none;">
+        See Features
+      </a>
+    </div>
+    <div style="margin-top:24px;font-size:0.78rem;color:var(--text-muted);">
+      No credit card. No downloads. Works on phone, tablet & desktop.
+    </div>
+  </div>
+  <div class="app-preview">
+    <img src="img/app-mockup.jpg" alt="TransformX AI App">
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-section" id="results">
+  <div class="stats-row">
+    <div class="stat-item scroll-reveal">
+      <div class="stat-num" id="statUsers">0</div>
+      <div class="stat-desc">Active Users</div>
+    </div>
+    <div class="stat-item scroll-reveal">
+      <div class="stat-num" id="statKg">0</div>
+      <div class="stat-desc">Kg Lost Collectively</div>
+    </div>
+    <div class="stat-item scroll-reveal">
+      <div class="stat-num" id="statPlans">0</div>
+      <div class="stat-desc">Workout Plans Generated</div>
+    </div>
+    <div class="stat-item scroll-reveal">
+      <div class="stat-num" id="statFoods">500+</div>
+      <div class="stat-desc">Indian Foods in Database</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div style="text-align:center;max-width:640px;margin:0 auto;">
+    <div class="section-eyebrow">Everything You Need</div>
+    <h2>Not Just a Tracker.<br><span class="text-gold">A Complete Transformation System.</span></h2>
+    <p style="margin-top:16px;">Every feature you need, none of the fluff. Built for serious people who want real results.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card scroll-reveal">
+      <div class="feature-icon">🤖</div>
+      <h3 style="font-size:1rem;margin-bottom:8px;">AI Coach (Real GPT)</h3>
+      <p style="font-size:0.85rem;line-height:1.7;">Your personal AI coach knows your full profile, history, and goals. Ask anything — diet, workouts, recovery — and get personalized, evidence-based answers.</p>
+    </div>
+    <div class="feature-card scroll-reveal">
+      <div class="feature-icon">🥗</div>
+      <h3 style="font-size:1rem;margin-bottom:8px;">Indian Food Database</h3>
+      <p style="font-size:0.85rem;line-height:1.7;">500+ Indian foods — dal, paneer, roti, sabzi, regional dishes. Log your meals in seconds. Macro tracking built around how India actually eats.</p>
+    </div>
+    <div class="feature-card scroll-reveal">
+      <div class="feature-icon">💪</div>
+      <h3 style="font-size:1rem;margin-bottom:8px;">Smart Workout Logger</h3>
+      <p style="font-size:0.85rem;line-height:1.7;">Log sets, reps, weight. Auto-detect personal records. Built-in rest timer with sound. 42 exercises with detailed instructions and pro tips.</p>
+    </div>
+    <div class="feature-card scroll-reveal">
+      <div class="feature-icon">📊</div>
+      <h3 style="font-size:1rem;margin-bottom:8px;">Progress Tracking</h3>
+      <p style="font-size:0.85rem;line-height:1.7;">Body measurements, weight history, progress photos (Front/Back/Side), BMI, BMR, TDEE calculator. Visual charts for every metric.</p>
+    </div>
+    <div class="feature-card scroll-reveal">
+      <div class="feature-icon">🏆</div>
+      <h3 style="font-size:1rem;margin-bottom:8px;">Gamification & XP</h3>
+      <p style="font-size:0.85rem;line-height:1.7;">Earn XP for every action. Unlock levels from Beginner to Elite. 20+ achievements to earn. Daily streaks and weekly missions keep you consistent.</p>
+    </div>
+    <div class="feature-card scroll-reveal">
+      <div class="feature-icon">✅</div>
+      <h3 style="font-size:1rem;margin-bottom:8px;">Habits & Routines</h3>
+      <p style="font-size:0.85rem;line-height:1.7;">Science-backed morning and night routines. Daily habit tracker with XP rewards. Journal with mood tracking. Build the rituals that create lasting change.</p>
+    </div>
+    <div class="feature-card scroll-reveal">
+      <div class="feature-icon">💊</div>
+      <h3 style="font-size:1rem;margin-bottom:8px;">Evidence-Based Supplements</h3>
+      <p style="font-size:0.85rem;line-height:1.7;">Tier 1-3 supplement guide based on peer-reviewed research. No bro-science. No scams. Only what actually works, with dosing and timing.</p>
+    </div>
+    <div class="feature-card scroll-reveal">
+      <div class="feature-icon">📅</div>
+      <h3 style="font-size:1rem;margin-bottom:8px;">Smart Calendar</h3>
+      <p style="font-size:0.85rem;line-height:1.7;">See your full month at a glance. Workouts, meals, and measurements plotted on a visual calendar. Click any day to see exactly what you did.</p>
+    </div>
+    <div class="feature-card scroll-reveal">
+      <div class="feature-icon">📤</div>
+      <h3 style="font-size:1rem;margin-bottom:8px;">Export Everything</h3>
+      <p style="font-size:0.85rem;line-height:1.7;">Export workouts, nutrition, measurements as CSV or JSON. Print progress reports as PDF. Your data, always accessible, always yours.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-it-works" id="how-it-works">
+  <div style="text-align:center;max-width:540px;margin:0 auto;">
+    <div class="section-eyebrow">Simple Setup</div>
+    <h2>Up and Running in <span class="text-gold">4 Steps</span></h2>
+  </div>
+  <div class="steps-row">
+    <div class="step-card scroll-reveal">
+      <div class="step-num">1</div>
+      <h4 style="margin-bottom:8px;">Create Account</h4>
+      <p style="font-size:0.82rem;color:var(--text-muted);">Sign up with email in 30 seconds. No credit card required.</p>
+    </div>
+    <div class="step-card scroll-reveal">
+      <div class="step-num">2</div>
+      <h4 style="margin-bottom:8px;">Complete Profile</h4>
+      <p style="font-size:0.82rem;color:var(--text-muted);">10-step wizard sets up your goals, body stats, diet, and equipment.</p>
+    </div>
+    <div class="step-card scroll-reveal">
+      <div class="step-num">3</div>
+      <h4 style="margin-bottom:8px;">Get Your Plan</h4>
+      <p style="font-size:0.82rem;color:var(--text-muted);">AI generates your personalized workout and meal plan instantly.</p>
+    </div>
+    <div class="step-card scroll-reveal">
+      <div class="step-num">4</div>
+      <h4 style="margin-bottom:8px;">Transform</h4>
+      <p style="font-size:0.82rem;color:var(--text-muted);">Log daily, chat with AI coach, track progress. See results in weeks.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section" id="testimonials">
+  <div style="text-align:center;max-width:540px;margin:0 auto;">
+    <div class="section-eyebrow">Real People. Real Results.</div>
+    <h2>They <span class="text-gold">Transformed.</span> You Can Too.</h2>
+  </div>
+  <div class="testimonials-grid" id="testimonialsContainer">
+    <!-- Rendered by JS -->
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section" id="faq">
+  <div style="text-align:center;max-width:540px;margin:0 auto;">
+    <div class="section-eyebrow">Questions Answered</div>
+    <h2>Everything You <span class="text-gold">Need to Know</span></h2>
+  </div>
+  <div class="faq-list" id="faqList">
+    <!-- Rendered by JS -->
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+  <div style="text-align:center;">
+    <div class="section-eyebrow">Pricing</div>
+    <h2>Start <span class="text-gold">100% Free</span></h2>
+    <p style="margin-top:12px;color:var(--text-muted);">Everything you see is free. No hidden fees. No premium locks.</p>
+  </div>
+  <div class="pricing-card">
+    <div class="pricing-badge">Currently Free</div>
+    <div class="pricing-price">₹0</div>
+    <div style="font-size:0.78rem;color:var(--text-muted);margin:8px 0 0;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Forever</div>
+    <ul class="pricing-features">
+      <li>Complete Workout Logger (42 exercises)</li>
+      <li>Full Nutrition Tracker (500+ Indian foods)</li>
+      <li>AI Coach (demo mode included)</li>
+      <li>Progress Tracking + Photos</li>
+      <li>Body Measurements (14 metrics)</li>
+      <li>Habits, Journal & Routines</li>
+      <li>Achievements & XP System</li>
+      <li>Export all your data (CSV/JSON)</li>
+      <li>Add your own OpenAI key for full AI</li>
+      <li>Dark & Light mode. Mobile optimized.</li>
+    </ul>
+    <a href="auth.html" class="btn btn-primary btn-full" style="text-decoration:none;margin-top:8px;">
+      ⚡ Start Your Free Transformation
+    </a>
+    <p style="font-size:0.75rem;color:var(--text-muted);margin-top:12px;">No credit card. No installs. Works on any device.</p>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="cta-section">
+  <div style="max-width:640px;margin:0 auto;text-align:center;">
+    <h2 style="color:var(--black);font-size:clamp(1.8rem,4vw,3rem);margin-bottom:16px;">The Best Time to Start<br>Was Yesterday. <br>The Second Best Time is <em>Now.</em></h2>
+    <p style="color:rgba(10,10,10,0.7);margin-bottom:28px;font-size:1rem;">Join thousands of Indians transforming their bodies with science and AI.</p>
+    <a href="auth.html" class="btn btn-lg" style="background:var(--black);color:var(--gold);text-decoration:none;font-size:1rem;">
+      ⚡ Begin Your Transformation →
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="landing-footer">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;">
+    <div class="landing-logo">
+      <div class="landing-logo-icon">⚡</div>
+      <div class="landing-logo-text">Transform<span>X AI</span></div>
+    </div>
+    <div style="font-size:0.8rem;color:var(--text-muted);">
+      Built with science. Designed for India. Free forever.
+    </div>
+    <div style="font-size:0.78rem;color:var(--text-muted);">
+      © 2025 TransformX AI. All data stored locally on your device.
+    </div>
+  </div>
+</footer>
+
+<script src="js/data.js"></script>
+<script>
+// ===== NAV SCROLL EFFECT =====
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('mainNav');
+  if (window.scrollY > 40) {
+    nav.style.background = 'rgba(10,10,10,0.97)';
+    nav.style.boxShadow = '0 4px 32px rgba(0,0,0,0.8)';
+  } else {
+    nav.style.background = 'rgba(10,10,10,0.92)';
+    nav.style.boxShadow = 'none';
+  }
+});
+
+// ===== SCROLL REVEAL =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.1 });
+document.querySelectorAll('.scroll-reveal').forEach(el => observer.observe(el));
+
+// ===== ANIMATED COUNTERS =====
+function animateCounter(el, target, suffix='', duration=2000) {
+  let start = 0;
+  const step = Math.ceil(target / (duration / 16));
+  const timer = setInterval(() => {
+    start += step;
+    if (start >= target) { start = target; clearInterval(timer); }
+    el.textContent = start.toLocaleString('en-IN') + suffix;
+  }, 16);
+}
+const statsObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      animateCounter(document.getElementById('statUsers'), 15000, '+');
+      animateCounter(document.getElementById('statKg'), 85000, '+');
+      animateCounter(document.getElementById('statPlans'), 42000, '+');
+      statsObserver.disconnect();
+    }
+  });
+}, { threshold: 0.5 });
+const statsSection = document.querySelector('.stats-section');
+if (statsSection) statsObserver.observe(statsSection);
+
+// ===== TESTIMONIALS =====
+if (window.TX_DATA && TX_DATA.testimonials) {
+  const container = document.getElementById('testimonialsContainer');
+  if (container) {
+    container.innerHTML = TX_DATA.testimonials.slice(0, 6).map(t => `
+      <div class="testimonial-card scroll-reveal">
+        <div class="testimonial-quote">"</div>
+        <div class="testimonial-result">${t.result}</div>
+        <p class="testimonial-text">${t.text}</p>
+        <div class="testimonial-author">
+          <div class="avatar">${t.avatar}</div>
+          <div>
+            <div class="testimonial-stars">${'★'.repeat(t.stars)}</div>
+            <div class="testimonial-name">${t.name}</div>
+            <div class="testimonial-city">📍 ${t.city} — ${t.goal}</div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+    container.querySelectorAll('.scroll-reveal').forEach(el => observer.observe(el));
+  }
+}
+
+// ===== FAQ =====
+if (window.TX_DATA && TX_DATA.faqs) {
+  const faqList = document.getElementById('faqList');
+  if (faqList) {
+    faqList.innerHTML = TX_DATA.faqs.map(faq => `
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this.parentElement)">
+          <span>${faq.q}</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">${faq.a}</div>
+      </div>
+    `).join('');
+  }
+}
+function toggleFaq(item) {
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+// ===== SMOOTH ANCHOR SCROLL =====
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const el = document.querySelector(a.getAttribute('href'));
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+</body>
+</html>

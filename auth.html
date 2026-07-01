@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Sign In — TransformX AI</title>
+  <meta name="description" content="Sign in or create your free TransformX AI account to start your transformation.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* AUTH PAGE SPECIFIC */
+    .auth-wrap {
+      min-height: 100vh;
+      display: flex;
+      background: var(--black);
+    }
+    /* LEFT PANEL - decorative */
+    .auth-left {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: 56px;
+    }
+    .auth-left-bg {
+      position: absolute;
+      inset: 0;
+    }
+    .auth-left-bg img {
+      width: 100%; height: 100%;
+      object-fit: cover; opacity: 0.4;
+      filter: saturate(0.4) contrast(1.1);
+    }
+    .auth-left-bg::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(10,10,10,0.85) 30%, rgba(10,10,10,0.5) 100%);
+    }
+    .auth-left-content { position: relative; z-index: 1; max-width: 480px; }
+    .auth-stat-row { display: flex; gap: 28px; margin-top: 32px; flex-wrap: wrap; }
+    .auth-stat { }
+    .auth-stat-num { font-size: 1.8rem; font-weight: 900; color: var(--gold); font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+    .auth-stat-label { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+
+    /* RIGHT PANEL - form */
+    .auth-right {
+      width: 460px;
+      flex-shrink: 0;
+      background: var(--bg-2);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .auth-right-inner {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 48px 40px;
+      min-height: 100vh;
+    }
+    .auth-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 900; font-size: 1.2rem; margin-bottom: 36px;
+    }
+    .auth-logo-icon {
+      width: 36px; height: 36px; background: var(--gold);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; color: var(--black);
+    }
+    .auth-logo-text span { color: var(--gold); }
+    .auth-tab-row {
+      display: flex; background: var(--bg-3); border-radius: var(--radius-sm);
+      padding: 4px; margin-bottom: 28px;
+    }
+    .auth-tab {
+      flex: 1; padding: 10px; text-align: center;
+      font-size: 0.85rem; font-weight: 700; color: var(--text-muted);
+      cursor: pointer; border-radius: 6px; transition: var(--transition-fast);
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .auth-tab.active { background: var(--gold); color: var(--black); }
+    .auth-form { display: none; }
+    .auth-form.active { display: block; }
+    .auth-footer-link {
+      text-align: center; margin-top: 20px;
+      font-size: 0.82rem; color: var(--text-muted);
+    }
+    .auth-footer-link a { color: var(--gold); font-weight: 700; }
+    .otp-digits {
+      display: flex; gap: 10px; justify-content: center; margin: 20px 0;
+    }
+    .otp-digit {
+      width: 52px; height: 56px; text-align: center;
+      font-size: 1.5rem; font-weight: 900; border-radius: var(--radius-sm);
+      border: 2px solid var(--border); background: var(--bg-3); color: var(--text);
+      transition: var(--transition-fast);
+    }
+    .otp-digit:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(245,166,35,0.15); }
+    .password-wrap { position: relative; }
+    .password-toggle {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; color: var(--text-muted); font-size: 1rem; cursor: pointer; border: none;
+      padding: 4px 8px;
+    }
+
+    /* MOBILE: stack vertically */
+    @media (max-width: 768px) {
+      .auth-wrap { flex-direction: column; }
+      .auth-left { min-height: 200px; flex: none; padding: 32px 24px; align-items: flex-start; justify-content: flex-end; }
+      .auth-left-content h2 { font-size: 1.5rem; }
+      .auth-right { width: 100%; border-left: none; border-top: 1px solid var(--border); }
+      .auth-right-inner { padding: 28px 20px; min-height: auto; }
+    }
+    @media (max-width: 480px) {
+      .auth-left { min-height: 160px; padding: 24px 16px; }
+      .auth-stat-row { gap: 20px; }
+      .auth-right-inner { padding: 24px 16px; }
+      .otp-digit { width: 44px; height: 50px; font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="auth-wrap">
+
+  <!-- LEFT: Branding Panel -->
+  <div class="auth-left">
+    <div class="auth-left-bg">
+      <img src="img/hero.jpg" alt="TransformX AI">
+    </div>
+    <div class="auth-left-content">
+      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.25);border-radius:999px;padding:5px 14px;font-size:0.72rem;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:20px;">
+        ⚡ India's #1 AI Fitness Platform
+      </div>
+      <h2 style="font-size:2rem;font-weight:900;line-height:1.2;margin-bottom:12px;">
+        Your Transformation<br>Starts <span style="color:var(--gold);">Right Now</span>
+      </h2>
+      <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.7;">
+        Join 15,000+ Indians who are building better bodies, better habits, and better lives with TransformX AI.
+      </p>
+      <div class="auth-stat-row">
+        <div class="auth-stat">
+          <div class="auth-stat-num">15K+</div>
+          <div class="auth-stat-label">Active Users</div>
+        </div>
+        <div class="auth-stat">
+          <div class="auth-stat-num">4.9★</div>
+          <div class="auth-stat-label">User Rating</div>
+        </div>
+        <div class="auth-stat">
+          <div class="auth-stat-num">100%</div>
+          <div class="auth-stat-label">Free Forever</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Auth Forms -->
+  <div class="auth-right">
+    <div class="auth-right-inner">
+      <!-- Logo -->
+      <div class="auth-logo">
+        <div class="auth-logo-icon">⚡</div>
+        <div class="auth-logo-text">Transform<span>X AI</span></div>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="auth-tab-row">
+        <div class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Sign In</div>
+        <div class="auth-tab" id="tabSignup" onclick="switchTab('signup')">Create Account</div>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div class="auth-form active" id="formLogin">
+        <div style="margin-bottom:24px;">
+          <h3 style="font-size:1.3rem;font-weight:900;margin-bottom:4px;">Welcome back 👋</h3>
+          <p style="font-size:0.85rem;color:var(--text-muted);">Sign in to continue your transformation journey.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div class="input-group">
+            <label class="input-label">Email Address</label>
+            <input type="email" class="input" id="loginEmail" placeholder="you@email.com" autocomplete="email">
+          </div>
+          <div class="input-group">
+            <label class="input-label" style="display:flex;justify-content:space-between;">
+              Password
+              <a href="#" onclick="forgotPassword()" style="color:var(--gold);font-weight:700;font-size:0.78rem;">Forgot?</a>
+            </label>
+            <div class="password-wrap">
+              <input type="password" class="input" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+              <button class="password-toggle" onclick="togglePass('loginPassword', this)" type="button">👁</button>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="handleLogin()" style="margin-top:4px;">
+            Sign In →
+          </button>
+        </div>
+        <div class="separator" style="margin:20px 0;">or</div>
+        <button class="btn btn-ghost btn-full" onclick="demoLogin()">
+          ⚡ Try Demo (No Account Needed)
+        </button>
+        <div class="auth-footer-link">
+          Don't have an account? <a href="#" onclick="switchTab('signup')">Create one free</a>
+        </div>
+      </div>
+
+      <!-- SIGNUP FORM -->
+      <div class="auth-form" id="formSignup">
+        <div style="margin-bottom:24px;">
+          <h3 style="font-size:1.3rem;font-weight:900;margin-bottom:4px;">Create Your Account</h3>
+          <p style="font-size:0.85rem;color:var(--text-muted);">Start your free transformation. No credit card needed.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="input-group">
+              <label class="input-label">First Name</label>
+              <input type="text" class="input" id="signupFirst" placeholder="Rahul" autocomplete="given-name">
+            </div>
+            <div class="input-group">
+              <label class="input-label">Last Name</label>
+              <input type="text" class="input" id="signupLast" placeholder="Sharma" autocomplete="family-name">
+            </div>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Email Address</label>
+            <input type="email" class="input" id="signupEmail" placeholder="you@email.com" autocomplete="email">
+          </div>
+          <div class="input-group">
+            <label class="input-label">Password</label>
+            <div class="password-wrap">
+              <input type="password" class="input" id="signupPassword" placeholder="Min 8 characters" autocomplete="new-password">
+              <button class="password-toggle" onclick="togglePass('signupPassword', this)" type="button">👁</button>
+            </div>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Confirm Password</label>
+            <input type="password" class="input" id="signupConfirm" placeholder="••••••••" autocomplete="new-password">
+          </div>
+          <button class="btn btn-primary btn-full" onclick="handleSignup()">
+            Create Free Account →
+          </button>
+        </div>
+        <div style="margin-top:16px;font-size:0.72rem;color:var(--text-muted);text-align:center;line-height:1.6;">
+          By creating an account, you agree that all your data is stored locally on your device. We don't collect personal data.
+        </div>
+        <div class="auth-footer-link">
+          Already have an account? <a href="#" onclick="switchTab('login')">Sign in</a>
+        </div>
+      </div>
+
+      <!-- OTP FORM (after signup) -->
+      <div class="auth-form" id="formOtp">
+        <div style="text-align:center;margin-bottom:24px;">
+          <div style="font-size:3rem;margin-bottom:12px;">📧</div>
+          <h3 style="font-size:1.3rem;font-weight:900;margin-bottom:8px;">Check Your Email</h3>
+          <p style="font-size:0.85rem;color:var(--text-muted);">We sent a 6-digit code to <strong id="otpEmail" style="color:var(--gold);"></strong></p>
+        </div>
+        <div class="otp-digits" id="otpDigits">
+          <input class="otp-digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]">
+          <input class="otp-digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]">
+          <input class="otp-digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]">
+          <input class="otp-digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]">
+          <input class="otp-digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]">
+          <input class="otp-digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        </div>
+        <button class="btn btn-primary btn-full" onclick="verifyOtp()">Verify & Continue →</button>
+        <button class="btn btn-ghost btn-full" style="margin-top:10px;" onclick="resendOtp()">Resend Code</button>
+        <div style="text-align:center;margin-top:16px;font-size:0.8rem;color:var(--text-muted);">
+          <strong style="color:var(--gold);">Demo tip:</strong> Use any 6 digits (e.g. 123456)
+        </div>
+      </div>
+
+    </div><!-- /auth-right-inner -->
+
+    <!-- Back to home link -->
+    <div style="padding:16px 40px 24px;text-align:center;border-top:1px solid var(--border);">
+      <a href="index.html" style="font-size:0.8rem;color:var(--text-muted);font-weight:600;">← Back to Home</a>
+    </div>
+  </div><!-- /auth-right -->
+
+</div><!-- /auth-wrap -->
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/utils.js"></script>
+<script>
+// Check if already logged in
+if (TXUtils.auth.isLoggedIn()) {
+  if (TXUtils.auth.onboardingComplete()) {
+    window.location.href = 'app.html';
+  } else {
+    window.location.href = 'onboarding.html';
+  }
+}
+
+// Apply theme
+TXUtils.theme.apply();
+
+let pendingUser = null;
+
+// ===== TAB SWITCHING =====
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  document.getElementById('form' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+}
+
+// ===== TOGGLE PASSWORD VISIBILITY =====
+function togglePass(id, btn) {
+  const input = document.getElementById(id);
+  if (input.type === 'password') { input.type = 'text'; btn.textContent = '🔒'; }
+  else { input.type = 'password'; btn.textContent = '👁'; }
+}
+
+// ===== LOGIN =====
+function handleLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!email) { toast('error', 'Please enter your email'); return; }
+  if (!password) { toast('error', 'Please enter your password'); return; }
+
+  // Check if user exists in localStorage
+  const users = JSON.parse(localStorage.getItem('tx_users') || '[]');
+  const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+
+  if (!user) { toast('error', 'No account found. Please sign up.'); return; }
+  if (user.password !== btoa(password)) { toast('error', 'Incorrect password. Try again.'); return; }
+
+  TXUtils.auth.login(user);
+  toast('success', '✅ Welcome back, ' + user.firstName + '!');
+  setTimeout(() => {
+    if (TXUtils.auth.onboardingComplete()) { window.location.href = 'app.html'; }
+    else { window.location.href = 'onboarding.html'; }
+  }, 800);
+}
+
+// ===== DEMO LOGIN =====
+function demoLogin() {
+  const demoUser = {
+    id: 'demo_user',
+    firstName: 'Demo', lastName: 'User',
+    email: 'demo@transformx.ai',
+    plan: 'Free',
+    created_at: new Date().toISOString().split('T')[0]
+  };
+  TXUtils.auth.login(demoUser);
+  // Set up demo profile
+  TXUtils.storage.set('user_profile', {
+    firstName: 'Demo', lastName: 'User',
+    age: 25, gender: 'Male', weight: 75, height: 175, targetWeight: 68,
+    bodyFat: '20-25%', fitnessLevel: 'Beginner',
+    goals: ['Fat Loss', 'Muscle Gain'],
+    equipment: ['Gym'],
+    activityLevel: 'Moderately Active (3-5 days/week)',
+    dietType: 'Non-Vegetarian',
+    city: 'Mumbai'
+  });
+  TXUtils.storage.set('onboarding_complete', true);
+  // Set AI plan
+  TXUtils.storage.set('ai_plan', {
+    targetCalories: 1900,
+    tdee: 2400,
+    macros: { protein: 165, carbs: 190, fat: 52 },
+    workout_plan: {
+      id: 'ppl', name: 'Push Pull Legs (PPL)', days: 6,
+      schedule: [
+        { day: 'Monday', name: 'Push', exercises: ['ex001','ex003','ex012','ex013','ex019','ex020'] },
+        { day: 'Tuesday', name: 'Pull', exercises: ['ex006','ex008','ex009','ex015','ex016','ex017'] },
+        { day: 'Wednesday', name: 'Legs', exercises: ['ex023','ex024','ex025','ex027','ex028','ex031'] },
+        { day: 'Thursday', name: 'Push', exercises: ['ex002','ex004','ex005','ex014','ex013','ex021'] },
+        { day: 'Friday', name: 'Pull', exercises: ['ex007','ex010','ex011','ex016','ex018','ex016'] },
+        { day: 'Saturday', name: 'Legs', exercises: ['ex029','ex030','ex026','ex025','ex028','ex032'] },
+        { day: 'Sunday', name: 'Rest', exercises: [] }
+      ]
+    },
+    generated_at: new Date().toISOString().split('T')[0]
+  });
+  toast('success', '⚡ Demo loaded! Explore TransformX AI');
+  setTimeout(() => window.location.href = 'app.html', 800);
+}
+
+// ===== SIGNUP =====
+function handleSignup() {
+  const first = document.getElementById('signupFirst').value.trim();
+  const last = document.getElementById('signupLast').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  const confirm = document.getElementById('signupConfirm').value;
+
+  if (!first) { toast('error', 'Enter your first name'); return; }
+  if (!email || !email.includes('@')) { toast('error', 'Enter a valid email'); return; }
+  if (password.length < 6) { toast('error', 'Password must be at least 6 characters'); return; }
+  if (password !== confirm) { toast('error', 'Passwords do not match'); return; }
+
+  // Check duplicate
+  const users = JSON.parse(localStorage.getItem('tx_users') || '[]');
+  if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
+    toast('error', 'Account already exists. Please sign in.'); return;
+  }
+
+  pendingUser = {
+    id: 'user_' + Date.now(),
+    firstName: first, lastName: last,
+    email, password: btoa(password),
+    plan: 'Free',
+    created_at: new Date().toISOString().split('T')[0]
+  };
+
+  // Show OTP form
+  document.getElementById('otpEmail').textContent = email;
+  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+  document.getElementById('formOtp').classList.add('active');
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  setupOtpInputs();
+  toast('info', '📧 Demo: use any 6 digits as OTP');
+}
+
+// ===== OTP =====
+function setupOtpInputs() {
+  const digits = document.querySelectorAll('.otp-digit');
+  digits.forEach((digit, idx) => {
+    digit.value = '';
+    digit.addEventListener('input', (e) => {
+      const val = e.target.value.replace(/\D/g, '');
+      e.target.value = val.slice(-1);
+      if (val && idx < digits.length - 1) digits[idx + 1].focus();
+    });
+    digit.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !digit.value && idx > 0) digits[idx - 1].focus();
+    });
+    digit.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const text = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+      text.split('').forEach((ch, i) => { if (digits[i]) digits[i].value = ch; });
+      if (digits[text.length - 1]) digits[text.length - 1].focus();
+    });
+  });
+  setTimeout(() => digits[0]?.focus(), 100);
+}
+
+function verifyOtp() {
+  const digits = document.querySelectorAll('.otp-digit');
+  const code = Array.from(digits).map(d => d.value).join('');
+  if (code.length < 6) { toast('error', 'Enter all 6 digits'); return; }
+  if (!pendingUser) { toast('error', 'Session expired. Please sign up again.'); switchTab('signup'); return; }
+
+  // Save user
+  const users = JSON.parse(localStorage.getItem('tx_users') || '[]');
+  users.push(pendingUser);
+  localStorage.setItem('tx_users', JSON.stringify(users));
+
+  TXUtils.auth.login(pendingUser);
+  toast('success', '🎉 Account created! Let\'s set up your profile.');
+  setTimeout(() => window.location.href = 'onboarding.html', 800);
+}
+
+function resendOtp() {
+  setupOtpInputs();
+  toast('info', '📧 OTP resent! (Demo: use any 6 digits)');
+}
+
+function forgotPassword() {
+  const email = document.getElementById('loginEmail').value.trim();
+  if (!email) { toast('info', 'Enter your email first, then click Forgot Password.'); return; }
+  toast('info', '📧 Password reset is not available in offline mode. Try the Demo Login.');
+}
+
+// ===== TOAST =====
+function toast(type, msg) {
+  const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span class="toast-icon">${icons[type] || 'ℹ️'}</span><span class="toast-msg">${msg}</span>`;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(() => { t.classList.add('removing'); setTimeout(() => t.remove(), 300); }, 3500);
+}
+
+// ===== ENTER KEY SUPPORT =====
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    if (document.getElementById('formLogin').classList.contains('active')) handleLogin();
+    else if (document.getElementById('formSignup').classList.contains('active')) handleSignup();
+    else if (document.getElementById('formOtp').classList.contains('active')) verifyOtp();
+  }
+});
+</script>
+</body>
+</html>

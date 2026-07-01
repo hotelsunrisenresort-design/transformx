@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Setup Profile — TransformX AI</title>
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { min-height: 100vh; display: flex; flex-direction: column; background: var(--black); }
+    .onboarding-wrap {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 24px 16px;
+      padding-top: calc(24px + env(safe-area-inset-top));
+      padding-bottom: calc(24px + env(safe-area-inset-bottom));
+    }
+    .onboarding-card {
+      width: 100%; max-width: 600px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 36px 36px 28px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(245,166,35,0.06);
+    }
+    @media (max-width: 600px) {
+      .onboarding-card { border-radius: var(--radius-lg); padding: 24px 20px 20px; }
+    }
+    @media (max-width: 360px) {
+      .onboarding-card { padding: 20px 14px 16px; }
+    }
+
+    /* Progress dots */
+    .step-dots { display: flex; gap: 6px; justify-content: center; margin-bottom: 28px; flex-wrap: wrap; }
+    .step-dot {
+      height: 5px; border-radius: 999px; background: var(--border); transition: all 0.35s ease;
+    }
+    .step-dot.active { background: var(--gold); width: 28px; }
+    .step-dot:not(.active) { width: 10px; }
+    .step-dot.done { background: #10b981; width: 10px; }
+
+    /* Step header */
+    .step-header { text-align: center; margin-bottom: 24px; }
+    .step-emoji { font-size: 2.5rem; margin-bottom: 12px; }
+    .step-title { font-size: 1.3rem; font-weight: 900; margin-bottom: 6px; }
+    .step-sub { font-size: 0.85rem; color: var(--text-muted); }
+
+    /* Steps */
+    .step { display: none; }
+    .step.active { display: block; animation: fadeIn 0.3s ease; }
+
+    /* Option grid */
+    .option-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+    .option-grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .option-grid-3 { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 400px) {
+      .option-grid { grid-template-columns: repeat(2, 1fr); }
+      .option-grid-3 { grid-template-columns: repeat(2, 1fr); }
+    }
+    .option-btn {
+      background: var(--bg-3); border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); padding: 14px 10px;
+      cursor: pointer; display: flex; flex-direction: column;
+      align-items: center; gap: 8px; font-size: 0.8rem;
+      font-weight: 700; color: var(--text-muted); transition: var(--transition-fast);
+      text-align: center; text-transform: uppercase; letter-spacing: 0.04em; min-height: 70px;
+      justify-content: center;
+    }
+    .option-btn:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-10); }
+    .option-btn.selected { border-color: var(--gold); color: var(--gold); background: var(--gold-10); box-shadow: 0 0 0 3px rgba(245,166,35,0.12); }
+    .option-icon { font-size: 1.5rem; }
+
+    /* Navigation */
+    .step-nav { display: flex; align-items: center; gap: 10px; margin-top: 24px; }
+    .step-counter { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin: 0 auto; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* Sliders */
+    .range-wrap { margin: 8px 0; }
+    .range-input {
+      -webkit-appearance: none; width: 100%; height: 6px;
+      border-radius: 999px; background: var(--bg-4); outline: none;
+      cursor: pointer;
+    }
+    .range-input::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 22px; height: 22px;
+      border-radius: 50%; background: var(--gold); cursor: pointer;
+      box-shadow: 0 0 0 4px rgba(245,166,35,0.2);
+    }
+    .range-input::-moz-range-thumb {
+      width: 22px; height: 22px;
+      border-radius: 50%; background: var(--gold); cursor: pointer; border: none;
+    }
+    .range-value {
+      text-align: center; font-size: 2rem; font-weight: 900; color: var(--gold);
+      margin: 8px 0; font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em;
+    }
+    .range-label { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; font-weight: 600; }
+
+    /* Input row */
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 360px) { .input-row { grid-template-columns: 1fr; } }
+
+    /* Success step */
+    .success-step { text-align: center; padding: 24px 0; }
+    .success-ring {
+      width: 100px; height: 100px; border-radius: 50%;
+      background: var(--gold-10); border: 3px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; margin: 0 auto 20px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(245,166,35,0.3); } 70% { box-shadow: 0 0 0 20px rgba(245,166,35,0); } }
+
+    /* Checkboxes multi-select */
+    .check-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
+    @media (max-width: 400px) { .check-grid { grid-template-columns: 1fr; } }
+    .check-item {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg-3); border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); padding: 12px;
+      cursor: pointer; font-size: 0.82rem; font-weight: 600;
+      color: var(--text-muted); transition: var(--transition-fast);
+    }
+    .check-item.selected { border-color: var(--gold); color: var(--gold); background: var(--gold-10); }
+    .check-box {
+      width: 20px; height: 20px; border-radius: 5px;
+      border: 2px solid var(--border); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 900; color: var(--black);
+      transition: var(--transition-fast);
+    }
+    .check-item.selected .check-box { background: var(--gold); border-color: var(--gold); }
+  </style>
+</head>
+<body>
+
+<div class="onboarding-wrap">
+  <!-- Top Logo -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;font-weight:900;font-size:1.1rem;">
+    <div style="width:34px;height:34px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;color:var(--black);">⚡</div>
+    <span>Transform<span style="color:var(--gold);">X AI</span></span>
+  </div>
+
+  <div class="onboarding-card">
+    <!-- Progress Dots -->
+    <div class="step-dots" id="stepDots"></div>
+
+    <!-- ===== STEP 1: BASICS ===== -->
+    <div class="step active" id="step1">
+      <div class="step-header">
+        <div class="step-emoji">👤</div>
+        <div class="step-title">Your Basic Info</div>
+        <div class="step-sub">We need this to personalize everything for you.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="input-row">
+          <div class="input-group">
+            <label class="input-label">First Name</label>
+            <input type="text" class="input" id="ob_first" placeholder="Rahul" autocomplete="given-name">
+          </div>
+          <div class="input-group">
+            <label class="input-label">Last Name</label>
+            <input type="text" class="input" id="ob_last" placeholder="Sharma" autocomplete="family-name">
+          </div>
+        </div>
+        <div class="input-row">
+          <div class="input-group">
+            <label class="input-label">Age</label>
+            <input type="number" class="input" id="ob_age" placeholder="25" min="13" max="80">
+          </div>
+          <div class="input-group">
+            <label class="input-label">City / Location</label>
+            <input type="text" class="input" id="ob_city" placeholder="Mumbai" autocomplete="address-level2">
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Gender</label>
+          <div class="option-grid option-grid-3">
+            <div class="option-btn selected" id="gender_male" onclick="selectOne('gender', this, 'Male')">
+              <div class="option-icon">♂️</div>Male
+            </div>
+            <div class="option-btn" id="gender_female" onclick="selectOne('gender', this, 'Female')">
+              <div class="option-icon">♀️</div>Female
+            </div>
+            <div class="option-btn" id="gender_other" onclick="selectOne('gender', this, 'Other')">
+              <div class="option-icon">⚧</div>Other
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 2: BODY STATS ===== -->
+    <div class="step" id="step2">
+      <div class="step-header">
+        <div class="step-emoji">⚖️</div>
+        <div class="step-title">Your Body Stats</div>
+        <div class="step-sub">Used to calculate your exact calorie and protein targets.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div class="input-group">
+          <label class="input-label">Current Weight</label>
+          <div class="range-value" id="weightVal">75 kg</div>
+          <div class="range-wrap">
+            <input type="range" class="range-input" id="ob_weight" min="35" max="200" value="75" oninput="rangeUpdate('ob_weight','weightVal','','kg')">
+          </div>
+          <div class="range-label"><span>35 kg</span><span>200 kg</span></div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Target Weight</label>
+          <div class="range-value" id="targetWeightVal">68 kg</div>
+          <div class="range-wrap">
+            <input type="range" class="range-input" id="ob_targetWeight" min="35" max="200" value="68" oninput="rangeUpdate('ob_targetWeight','targetWeightVal','','kg')">
+          </div>
+          <div class="range-label"><span>35 kg</span><span>200 kg</span></div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Height</label>
+          <div class="range-value" id="heightVal">175 cm</div>
+          <div class="range-wrap">
+            <input type="range" class="range-input" id="ob_height" min="140" max="220" value="175" oninput="rangeUpdate('ob_height','heightVal','','cm')">
+          </div>
+          <div class="range-label"><span>140 cm</span><span>220 cm</span></div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Estimated Body Fat %</label>
+          <div class="option-grid" style="grid-template-columns:repeat(auto-fill,minmax(110px,1fr));">
+            <div class="option-btn selected" onclick="selectOne('bf', this, '8-12%')"><span class="option-icon">💎</span>8-12% Athletic</div>
+            <div class="option-btn" onclick="selectOne('bf', this, '12-17%')"><span class="option-icon">🏃</span>12-17% Fit</div>
+            <div class="option-btn" onclick="selectOne('bf', this, '17-22%')"><span class="option-icon">💪</span>17-22% Average</div>
+            <div class="option-btn" onclick="selectOne('bf', this, '22-28%')"><span class="option-icon">🔥</span>22-28% Above Avg</div>
+            <div class="option-btn" onclick="selectOne('bf', this, '28%+')"><span class="option-icon">⚡</span>28%+ High</div>
+            <div class="option-btn" onclick="selectOne('bf', this, 'Unsure')"><span class="option-icon">❓</span>Not Sure</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 3: FITNESS GOALS ===== -->
+    <div class="step" id="step3">
+      <div class="step-header">
+        <div class="step-emoji">🎯</div>
+        <div class="step-title">What Are Your Goals?</div>
+        <div class="step-sub">Select all that apply. We'll prioritize your top goal.</div>
+      </div>
+      <div class="check-grid" id="goalsGrid">
+        <div class="check-item selected" onclick="toggleCheck(this,'Fat Loss')">
+          <div class="check-box">✓</div><span>🔥 Fat Loss</span>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this,'Muscle Gain')">
+          <div class="check-box"></div><span>💪 Muscle Gain</span>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this,'Body Recomposition')">
+          <div class="check-box"></div><span>⚡ Body Recomp</span>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this,'Increase Strength')">
+          <div class="check-box"></div><span>🏋️ Strength</span>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this,'Improve Endurance')">
+          <div class="check-box"></div><span>🏃 Endurance</span>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this,'Improve Flexibility')">
+          <div class="check-box"></div><span>🧘 Flexibility</span>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this,'Better Sleep')">
+          <div class="check-box"></div><span>😴 Better Sleep</span>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this,'General Health')">
+          <div class="check-box"></div><span>❤️ General Health</span>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this,'Athletic Performance')">
+          <div class="check-box"></div><span>🏆 Performance</span>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this,'Grooming & Lifestyle')">
+          <div class="check-box"></div><span>✨ Grooming</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 4: FITNESS LEVEL ===== -->
+    <div class="step" id="step4">
+      <div class="step-header">
+        <div class="step-emoji">💪</div>
+        <div class="step-title">Fitness Level</div>
+        <div class="step-sub">Be honest — this determines exercise difficulty.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="option-btn selected" id="fl_beginner" onclick="selectOne('fl',this,'Beginner')" style="flex-direction:row;justify-content:flex-start;padding:16px;">
+          <span class="option-icon">🌱</span>
+          <div>
+            <div style="font-size:0.9rem;font-weight:800;text-align:left;">Beginner</div>
+            <div style="font-size:0.75rem;font-weight:400;color:var(--text-muted);text-align:left;text-transform:none;letter-spacing:0;">Less than 1 year of training</div>
+          </div>
+        </div>
+        <div class="option-btn" id="fl_intermediate" onclick="selectOne('fl',this,'Intermediate')" style="flex-direction:row;justify-content:flex-start;padding:16px;">
+          <span class="option-icon">🏋️</span>
+          <div>
+            <div style="font-size:0.9rem;font-weight:800;text-align:left;">Intermediate</div>
+            <div style="font-size:0.75rem;font-weight:400;color:var(--text-muted);text-align:left;text-transform:none;letter-spacing:0;">1-3 years, know the basics</div>
+          </div>
+        </div>
+        <div class="option-btn" id="fl_advanced" onclick="selectOne('fl',this,'Advanced')" style="flex-direction:row;justify-content:flex-start;padding:16px;">
+          <span class="option-icon">🏆</span>
+          <div>
+            <div style="font-size:0.9rem;font-weight:800;text-align:left;">Advanced</div>
+            <div style="font-size:0.75rem;font-weight:400;color:var(--text-muted);text-align:left;text-transform:none;letter-spacing:0;">3+ years, serious training</div>
+          </div>
+        </div>
+        <div class="option-btn" id="fl_athlete" onclick="selectOne('fl',this,'Athlete')" style="flex-direction:row;justify-content:flex-start;padding:16px;">
+          <span class="option-icon">⚡</span>
+          <div>
+            <div style="font-size:0.9rem;font-weight:800;text-align:left;">Athlete</div>
+            <div style="font-size:0.75rem;font-weight:400;color:var(--text-muted);text-align:left;text-transform:none;letter-spacing:0;">Competitive or sport-specific</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 5: ACTIVITY LEVEL ===== -->
+    <div class="step" id="step5">
+      <div class="step-header">
+        <div class="step-emoji">🏃</div>
+        <div class="step-title">Daily Activity Level</div>
+        <div class="step-sub">Think about your job and non-gym activity.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="option-btn" onclick="selectOne('activity',this,'Sedentary (desk job, little movement)')" style="flex-direction:row;justify-content:flex-start;padding:16px;">
+          <span class="option-icon">💻</span>
+          <div>
+            <div style="font-size:0.88rem;font-weight:800;text-align:left;">Sedentary</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);text-align:left;text-transform:none;letter-spacing:0;">Desk job, minimal movement, TDEE ×1.2</div>
+          </div>
+        </div>
+        <div class="option-btn" onclick="selectOne('activity',this,'Lightly Active (light exercise 1-3 days/week)')" style="flex-direction:row;justify-content:flex-start;padding:16px;">
+          <span class="option-icon">🚶</span>
+          <div>
+            <div style="font-size:0.88rem;font-weight:800;text-align:left;">Lightly Active</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);text-align:left;text-transform:none;letter-spacing:0;">Light walks or exercise 1-3 days, TDEE ×1.375</div>
+          </div>
+        </div>
+        <div class="option-btn selected" onclick="selectOne('activity',this,'Moderately Active (3-5 days/week)')" style="flex-direction:row;justify-content:flex-start;padding:16px;">
+          <span class="option-icon">🏋️</span>
+          <div>
+            <div style="font-size:0.88rem;font-weight:800;text-align:left;">Moderately Active</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);text-align:left;text-transform:none;letter-spacing:0;">Gym 3-5 days/week, TDEE ×1.55</div>
+          </div>
+        </div>
+        <div class="option-btn" onclick="selectOne('activity',this,'Very Active (hard exercise 6-7 days/week)')" style="flex-direction:row;justify-content:flex-start;padding:16px;">
+          <span class="option-icon">🔥</span>
+          <div>
+            <div style="font-size:0.88rem;font-weight:800;text-align:left;">Very Active</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);text-align:left;text-transform:none;letter-spacing:0;">Hard training 6-7 days, physical job, TDEE ×1.725</div>
+          </div>
+        </div>
+        <div class="option-btn" onclick="selectOne('activity',this,'Extra Active (athlete, 2x/day training)')" style="flex-direction:row;justify-content:flex-start;padding:16px;">
+          <span class="option-icon">⚡</span>
+          <div>
+            <div style="font-size:0.88rem;font-weight:800;text-align:left;">Extra Active</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);text-align:left;text-transform:none;letter-spacing:0;">Athlete, 2x daily, physical job, TDEE ×1.9</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 6: WORKOUT DAYS ===== -->
+    <div class="step" id="step6">
+      <div class="step-header">
+        <div class="step-emoji">📅</div>
+        <div class="step-title">Workout Frequency</div>
+        <div class="step-sub">How many days per week can you train?</div>
+      </div>
+      <div class="input-group" style="margin-bottom:20px;">
+        <label class="input-label">Days per week</label>
+        <div class="range-value" id="workoutDaysVal">4 days</div>
+        <div class="range-wrap">
+          <input type="range" class="range-input" id="ob_workoutDays" min="2" max="7" value="4" oninput="rangeUpdate('ob_workoutDays','workoutDaysVal','','day',true)">
+        </div>
+        <div class="range-label"><span>2 days</span><span>7 days</span></div>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Equipment Available</label>
+        <div class="check-grid">
+          <div class="check-item selected" onclick="toggleCheck(this,'Gym')"><div class="check-box">✓</div><span>🏋️ Full Gym</span></div>
+          <div class="check-item" onclick="toggleCheck(this,'Home Gym')"><div class="check-box"></div><span>🏠 Home Gym</span></div>
+          <div class="check-item" onclick="toggleCheck(this,'Dumbbells')"><div class="check-box"></div><span>💪 Dumbbells</span></div>
+          <div class="check-item" onclick="toggleCheck(this,'Resistance Bands')"><div class="check-box"></div><span>🎗️ Bands</span></div>
+          <div class="check-item" onclick="toggleCheck(this,'Bodyweight Only')"><div class="check-box"></div><span>🤸 Bodyweight</span></div>
+          <div class="check-item" onclick="toggleCheck(this,'Barbell')"><div class="check-box"></div><span>🏋️ Barbell</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 7: DIET =====  -->
+    <div class="step" id="step7">
+      <div class="step-header">
+        <div class="step-emoji">🥗</div>
+        <div class="step-title">Your Diet Type</div>
+        <div class="step-sub">This determines your food recommendations and meal plans.</div>
+      </div>
+      <div class="option-grid option-grid-2" style="margin-bottom:20px;">
+        <div class="option-btn selected" onclick="selectOne('diet',this,'Non-Vegetarian')"><span class="option-icon">🍗</span>Non-Vegetarian</div>
+        <div class="option-btn" onclick="selectOne('diet',this,'Vegetarian')"><span class="option-icon">🥦</span>Vegetarian</div>
+        <div class="option-btn" onclick="selectOne('diet',this,'Vegan')"><span class="option-icon">🌱</span>Vegan</div>
+        <div class="option-btn" onclick="selectOne('diet',this,'Eggetarian')"><span class="option-icon">🥚</span>Eggetarian</div>
+        <div class="option-btn" onclick="selectOne('diet',this,'Keto')"><span class="option-icon">🥑</span>Keto</div>
+        <div class="option-btn" onclick="selectOne('diet',this,'Jain')"><span class="option-icon">🙏</span>Jain</div>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Daily Food Budget (approx)</label>
+        <div class="option-grid option-grid-3">
+          <div class="option-btn" onclick="selectOne('food_budget',this,'₹100-200')"><span class="option-icon">💰</span>₹100-200</div>
+          <div class="option-btn selected" onclick="selectOne('food_budget',this,'₹200-400')"><span class="option-icon">💵</span>₹200-400</div>
+          <div class="option-btn" onclick="selectOne('food_budget',this,'₹400-700')"><span class="option-icon">💴</span>₹400-700</div>
+          <div class="option-btn" onclick="selectOne('food_budget',this,'₹700+')"><span class="option-icon">💎</span>₹700+</div>
+          <div class="option-btn" onclick="selectOne('food_budget',this,'No limit')"><span class="option-icon">🚀</span>No Limit</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 8: HEALTH =====  -->
+    <div class="step" id="step8">
+      <div class="step-header">
+        <div class="step-emoji">❤️</div>
+        <div class="step-title">Health Conditions</div>
+        <div class="step-sub">Select any that apply. Helps AI personalize your plan safely.</div>
+      </div>
+      <div class="check-grid" id="conditionsGrid" style="margin-bottom:16px;">
+        <div class="check-item" onclick="toggleCheck(this,'Diabetes')"><div class="check-box"></div><span>🩸 Diabetes</span></div>
+        <div class="check-item" onclick="toggleCheck(this,'Hypertension')"><div class="check-box"></div><span>❤️ Hypertension</span></div>
+        <div class="check-item" onclick="toggleCheck(this,'Thyroid Issues')"><div class="check-box"></div><span>🦋 Thyroid</span></div>
+        <div class="check-item" onclick="toggleCheck(this,'PCOS')"><div class="check-box"></div><span>⚡ PCOS</span></div>
+        <div class="check-item" onclick="toggleCheck(this,'Back Pain')"><div class="check-box"></div><span>🦴 Back Pain</span></div>
+        <div class="check-item" onclick="toggleCheck(this,'Knee Issues')"><div class="check-box"></div><span>🦵 Knee Issues</span></div>
+        <div class="check-item" onclick="toggleCheck(this,'Heart Condition')"><div class="check-box"></div><span>💓 Heart Issue</span></div>
+        <div class="check-item" onclick="toggleCheck(this,'None')"><div class="check-box"></div><span>✅ None / Healthy</span></div>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Any injuries or specific issues? (optional)</label>
+        <input type="text" class="input" id="ob_injuries" placeholder="e.g. Right shoulder pain, pulled hamstring..." autocomplete="off">
+      </div>
+    </div>
+
+    <!-- ===== STEP 9: SCHEDULE =====  -->
+    <div class="step" id="step9">
+      <div class="step-header">
+        <div class="step-emoji">⏰</div>
+        <div class="step-title">Your Preferences</div>
+        <div class="step-sub">Helps us recommend optimal workout times and supplements.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="input-group">
+          <label class="input-label">Preferred Workout Time</label>
+          <div class="option-grid option-grid-3">
+            <div class="option-btn selected" onclick="selectOne('workout_time',this,'Early Morning (5-7am)')"><span class="option-icon">🌅</span>5-7 AM</div>
+            <div class="option-btn" onclick="selectOne('workout_time',this,'Morning (7-10am)')"><span class="option-icon">☀️</span>7-10 AM</div>
+            <div class="option-btn" onclick="selectOne('workout_time',this,'Afternoon (12-3pm)')"><span class="option-icon">🕛</span>Afternoon</div>
+            <div class="option-btn" onclick="selectOne('workout_time',this,'Evening (5-7pm)')"><span class="option-icon">🌆</span>Evening</div>
+            <div class="option-btn" onclick="selectOne('workout_time',this,'Night (8-10pm)')"><span class="option-icon">🌙</span>Night</div>
+            <div class="option-btn" onclick="selectOne('workout_time',this,'Flexible')"><span class="option-icon">⚡</span>Flexible</div>
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Monthly Supplement Budget</label>
+          <div class="option-grid option-grid-3">
+            <div class="option-btn selected" onclick="selectOne('supp_budget',this,'None (food only)')"><span class="option-icon">🥗</span>None</div>
+            <div class="option-btn" onclick="selectOne('supp_budget',this,'₹500-1000')"><span class="option-icon">💰</span>₹500-1K</div>
+            <div class="option-btn" onclick="selectOne('supp_budget',this,'₹1000-2500')"><span class="option-icon">💵</span>₹1-2.5K</div>
+            <div class="option-btn" onclick="selectOne('supp_budget',this,'₹2500+')"><span class="option-icon">💎</span>₹2.5K+</div>
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">App Notifications</label>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg-3);border-radius:var(--radius-sm);">
+              <span style="font-size:0.85rem;font-weight:600;">💪 Workout reminders</span>
+              <div class="toggle on" id="notif_workout" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg-3);border-radius:var(--radius-sm);">
+              <span style="font-size:0.85rem;font-weight:600;">🥗 Meal logging reminders</span>
+              <div class="toggle on" id="notif_meals" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg-3);border-radius:var(--radius-sm);">
+              <span style="font-size:0.85rem;font-weight:600;">💧 Water reminders</span>
+              <div class="toggle on" id="notif_water" onclick="this.classList.toggle('on')"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 10: COMPLETE =====  -->
+    <div class="step" id="step10">
+      <div class="success-step">
+        <div class="success-ring">⚡</div>
+        <h2 style="font-size:1.5rem;margin-bottom:8px;">Your Plan is Ready!</h2>
+        <p id="planSummaryText" style="font-size:0.88rem;color:var(--text-muted);margin-bottom:24px;line-height:1.7;"></p>
+        <div id="planCards" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:24px;text-align:center;">
+          <!-- Rendered by JS -->
+        </div>
+        <div id="motivationalQuote" style="background:var(--gold-10);border:1px solid var(--gold-20);border-radius:var(--radius-sm);padding:14px 18px;font-size:0.82rem;color:var(--text-dim);font-style:italic;margin-bottom:24px;line-height:1.7;"></div>
+        <button class="btn btn-primary btn-full btn-lg" onclick="goToDashboard()">
+          ⚡ Enter TransformX AI →
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="step-nav" id="stepNavigation">
+      <button class="btn btn-ghost btn-sm" id="backBtn" onclick="prevStep()" style="display:none;">← Back</button>
+      <span class="step-counter" id="stepCounter">Step 1 of 10</span>
+      <button class="btn btn-primary btn-sm" id="nextBtn" onclick="nextStep()">Next →</button>
+    </div>
+  </div><!-- /onboarding-card -->
+</div><!-- /onboarding-wrap -->
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/utils.js"></script>
+<script>
+// ===== STATE =====
+const TOTAL_STEPS = 10;
+let currentStep = 1;
+const selections = {
+  gender: 'Male', bf: '17-22%', goals: ['Fat Loss'],
+  fl: 'Beginner', activity: 'Moderately Active (3-5 days/week)',
+  diet: 'Non-Vegetarian', food_budget: '₹200-400',
+  equipment: ['Gym'], conditions: [],
+  workout_time: 'Early Morning (5-7am)', supp_budget: 'None (food only)'
+};
+
+// Prefill from existing user
+const user = TXUtils.auth.getUser();
+if (user) {
+  document.getElementById('ob_first').value = user.firstName || '';
+  document.getElementById('ob_last').value = user.lastName || '';
+}
+const existing = TXUtils.storage.get('user_profile');
+if (existing) {
+  if (existing.age) document.getElementById('ob_age').value = existing.age;
+  if (existing.city) document.getElementById('ob_city').value = existing.city;
+}
+
+// Apply theme
+TXUtils.theme.apply();
+
+// ===== DOTS =====
+function renderDots() {
+  const c = document.getElementById('stepDots');
+  c.innerHTML = Array.from({length: TOTAL_STEPS}, (_, i) => {
+    const n = i + 1;
+    const cls = n < currentStep ? 'done' : n === currentStep ? 'active' : '';
+    return `<div class="step-dot ${cls}"></div>`;
+  }).join('');
+}
+
+// ===== SELECT ONE =====
+function selectOne(group, el, value) {
+  document.querySelectorAll(`[onclick*="selectOne('${group}"`).forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selections[group] = value;
+}
+
+// ===== TOGGLE CHECK =====
+function toggleCheck(el, value) {
+  const group = el.closest('.check-grid').id || 'multi';
+  if (value === 'None' || value === 'Healthy') {
+    // Clear all others
+    el.closest('.check-grid').querySelectorAll('.check-item').forEach(b => {
+      b.classList.remove('selected'); b.querySelector('.check-box').textContent = '';
+    });
+    el.classList.add('selected'); el.querySelector('.check-box').textContent = '✓';
+    if (group === 'conditionsGrid') selections.conditions = [value];
+    else if (group === 'goalsGrid') selections.goals = [value];
+    return;
+  }
+  el.classList.toggle('selected');
+  const isSelected = el.classList.contains('selected');
+  el.querySelector('.check-box').textContent = isSelected ? '✓' : '';
+
+  // Manage arrays
+  let arr;
+  if (el.closest('#goalsGrid')) arr = selections.goals;
+  else if (el.closest('#conditionsGrid')) arr = selections.conditions;
+  else arr = selections.equipment;
+
+  if (isSelected) { if (!arr.includes(value)) arr.push(value); }
+  else { const i = arr.indexOf(value); if (i > -1) arr.splice(i, 1); }
+}
+
+// ===== RANGE =====
+function rangeUpdate(inputId, displayId, prefix='', suffix='', plural=false) {
+  const val = document.getElementById(inputId).value;
+  let label = prefix + val;
+  if (suffix) label += plural ? (val == 1 ? ' day' : ' days') : ' ' + suffix;
+  document.getElementById(displayId).textContent = label;
+}
+
+// ===== NAVIGATE =====
+function nextStep() {
+  if (!validateStep()) return;
+  if (currentStep < TOTAL_STEPS) {
+    currentStep++;
+    showStep();
+  }
+}
+function prevStep() {
+  if (currentStep > 1) { currentStep--; showStep(); }
+}
+
+function showStep() {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + currentStep).classList.add('active');
+  document.getElementById('stepCounter').textContent = `Step ${currentStep} of ${TOTAL_STEPS}`;
+  document.getElementById('backBtn').style.display = currentStep > 1 ? '' : 'none';
+  document.getElementById('nextBtn').style.display = currentStep === TOTAL_STEPS ? 'none' : '';
+  document.getElementById('stepNavigation').style.display = currentStep === TOTAL_STEPS ? 'none' : '';
+  renderDots();
+  if (currentStep === TOTAL_STEPS) buildPlan();
+  window.scrollTo(0, 0);
+}
+
+// ===== VALIDATION =====
+function validateStep() {
+  if (currentStep === 1) {
+    if (!document.getElementById('ob_first').value.trim()) { toast('error','Enter your first name'); return false; }
+    if (!document.getElementById('ob_age').value) { toast('error','Enter your age'); return false; }
+  }
+  if (currentStep === 3) {
+    if (!selections.goals.length) { toast('error','Select at least one goal'); return false; }
+  }
+  return true;
+}
+
+// ===== BUILD AI PLAN =====
+function buildPlan() {
+  const w = parseInt(document.getElementById('ob_weight').value) || 75;
+  const h = parseInt(document.getElementById('ob_height').value) || 175;
+  const age = parseInt(document.getElementById('ob_age').value) || 25;
+  const g = selections.gender;
+  const days = parseInt(document.getElementById('ob_workoutDays').value) || 4;
+
+  // Compute BMR (Mifflin-St Jeor)
+  let bmr = g === 'Male' ? (10*w + 6.25*h - 5*age + 5) : (10*w + 6.25*h - 5*age - 161);
+  const tdeeMultipliers = {
+    'Sedentary': 1.2, 'Lightly Active': 1.375, 'Moderately Active': 1.55, 'Very Active': 1.725, 'Extra Active': 1.9
+  };
+  const actKey = Object.keys(tdeeMultipliers).find(k => selections.activity.startsWith(k)) || 'Moderately Active';
+  const tdee = Math.round(bmr * tdeeMultipliers[actKey]);
+
+  // Calorie target based on goals
+  const primaryGoal = selections.goals[0];
+  let targetCals;
+  if (primaryGoal === 'Fat Loss') targetCals = tdee - 500;
+  else if (primaryGoal === 'Muscle Gain') targetCals = tdee + 300;
+  else if (primaryGoal === 'Body Recomposition') targetCals = tdee - 100;
+  else targetCals = tdee;
+  targetCals = Math.max(1200, Math.round(targetCals / 50) * 50);
+
+  // Macros
+  const protein = Math.round(w * 2.2);
+  const fat = Math.round(targetCals * 0.25 / 9);
+  const carbs = Math.round((targetCals - protein*4 - fat*9) / 4);
+
+  // Workout plan
+  const workoutPlans = {
+    2: { id: 'fb', name: 'Full Body 2x', schedule: [
+      {day:'Monday',name:'Full Body A',exercises:['ex001','ex006','ex023','ex009','ex019','ex027']},
+      {day:'Thursday',name:'Full Body B',exercises:['ex002','ex007','ex024','ex010','ex020','ex028']},
+      {day:'Tuesday',name:'Rest',exercises:[]},{day:'Wednesday',name:'Rest',exercises:[]},
+      {day:'Friday',name:'Rest',exercises:[]},{day:'Saturday',name:'Rest',exercises:[]},{day:'Sunday',name:'Rest',exercises:[]}
+    ]},
+    3: { id: 'ppl3', name: 'Push Pull Legs', schedule: [
+      {day:'Monday',name:'Push',exercises:['ex001','ex003','ex012','ex013','ex019','ex020']},
+      {day:'Wednesday',name:'Pull',exercises:['ex006','ex008','ex009','ex015','ex016','ex017']},
+      {day:'Friday',name:'Legs',exercises:['ex023','ex024','ex025','ex027','ex028','ex031']},
+      {day:'Tuesday',name:'Rest',exercises:[]},{day:'Thursday',name:'Rest',exercises:[]},
+      {day:'Saturday',name:'Rest',exercises:[]},{day:'Sunday',name:'Rest',exercises:[]}
+    ]},
+    4: { id: 'ul4', name: 'Upper Lower 4x', schedule: [
+      {day:'Monday',name:'Upper A',exercises:['ex001','ex006','ex003','ex009','ex012','ex015']},
+      {day:'Tuesday',name:'Lower A',exercises:['ex023','ex024','ex025','ex027','ex028','ex031']},
+      {day:'Thursday',name:'Upper B',exercises:['ex002','ex007','ex004','ex010','ex013','ex016']},
+      {day:'Friday',name:'Lower B',exercises:['ex029','ex030','ex026','ex025','ex028','ex032']},
+      {day:'Wednesday',name:'Rest',exercises:[]},{day:'Saturday',name:'Rest',exercises:[]},{day:'Sunday',name:'Rest',exercises:[]}
+    ]},
+    5: { id: 'bro5', name: 'Bro Split 5x', schedule: [
+      {day:'Monday',name:'Chest & Triceps',exercises:['ex001','ex003','ex004','ex019','ex020','ex021']},
+      {day:'Tuesday',name:'Back & Biceps',exercises:['ex006','ex007','ex008','ex015','ex016','ex017']},
+      {day:'Wednesday',name:'Shoulders',exercises:['ex012','ex013','ex014','ex011','ex010','ex009']},
+      {day:'Thursday',name:'Legs',exercises:['ex023','ex024','ex025','ex027','ex028','ex031']},
+      {day:'Friday',name:'Arms',exercises:['ex019','ex020','ex015','ex016','ex021','ex018']},
+      {day:'Saturday',name:'Rest',exercises:[]},{day:'Sunday',name:'Rest',exercises:[]}
+    ]},
+    6: { id: 'ppl6', name: 'PPL 6x', schedule: [
+      {day:'Monday',name:'Push',exercises:['ex001','ex003','ex012','ex013','ex019','ex020']},
+      {day:'Tuesday',name:'Pull',exercises:['ex006','ex008','ex009','ex015','ex016','ex017']},
+      {day:'Wednesday',name:'Legs',exercises:['ex023','ex024','ex025','ex027','ex028','ex031']},
+      {day:'Thursday',name:'Push',exercises:['ex002','ex004','ex005','ex014','ex013','ex021']},
+      {day:'Friday',name:'Pull',exercises:['ex007','ex010','ex011','ex016','ex018','ex016']},
+      {day:'Saturday',name:'Legs',exercises:['ex029','ex030','ex026','ex025','ex028','ex032']},
+      {day:'Sunday',name:'Rest',exercises:[]}
+    ]},
+    7: { id: 'full7', name: 'Daily Training 7x', schedule: [
+      {day:'Monday',name:'Chest',exercises:['ex001','ex002','ex003','ex004','ex005','ex019']},
+      {day:'Tuesday',name:'Back',exercises:['ex006','ex007','ex008','ex009','ex010','ex011']},
+      {day:'Wednesday',name:'Shoulders',exercises:['ex012','ex013','ex014','ex015','ex010','ex009']},
+      {day:'Thursday',name:'Legs',exercises:['ex023','ex024','ex025','ex027','ex028','ex031']},
+      {day:'Friday',name:'Arms',exercises:['ex015','ex016','ex017','ex019','ex020','ex021']},
+      {day:'Saturday',name:'Full Body',exercises:['ex001','ex006','ex023','ex012','ex019','ex027']},
+      {day:'Sunday',name:'Active Recovery',exercises:['ex038','ex039','ex040','ex041','ex042']}
+    ]}
+  };
+  const wp = workoutPlans[Math.min(7, Math.max(2, days))] || workoutPlans[4];
+  wp.days = days;
+
+  const profile = {
+    firstName: document.getElementById('ob_first').value.trim() || user?.firstName || 'Champion',
+    lastName: document.getElementById('ob_last').value.trim() || user?.lastName || '',
+    age, gender: g, weight: w,
+    height: h,
+    targetWeight: parseInt(document.getElementById('ob_targetWeight').value) || 68,
+    bodyFat: selections.bf,
+    fitnessLevel: selections.fl,
+    goals: selections.goals,
+    equipment: selections.equipment,
+    activityLevel: selections.activity,
+    dietType: selections.diet,
+    foodBudget: selections.food_budget,
+    suppBudget: selections.supp_budget,
+    workoutDays: days,
+    workoutTime: selections.workout_time,
+    conditions: selections.conditions,
+    injuries: document.getElementById('ob_injuries').value.trim(),
+    city: document.getElementById('ob_city').value.trim() || 'India',
+    notif_workout: document.getElementById('notif_workout').classList.contains('on'),
+    notif_meals: document.getElementById('notif_meals').classList.contains('on'),
+    notif_water: document.getElementById('notif_water').classList.contains('on'),
+  };
+
+  const aiPlan = { targetCalories: targetCals, tdee, bmr: Math.round(bmr), macros: { protein, carbs, fat }, workout_plan: wp, generated_at: new Date().toISOString().split('T')[0] };
+
+  TXUtils.storage.set('user_profile', profile);
+  TXUtils.storage.set('ai_plan', aiPlan);
+  TXUtils.storage.set('onboarding_complete', true);
+  TXUtils.xp.add(100, 'Completed onboarding');
+
+  // Render summary
+  document.getElementById('planSummaryText').innerHTML = `
+    Hey <strong style="color:var(--gold);">${profile.firstName}</strong>! Your personalized plan is ready based on your body stats, goals, and lifestyle. 
+    Your daily calorie target is <strong style="color:var(--gold);">${targetCals} kcal</strong> and you'll train <strong style="color:var(--gold);">${days} days/week</strong> with the <strong>${wp.name}</strong>.
+  `;
+  document.getElementById('planCards').innerHTML = `
+    <div style="background:var(--bg-3);border:1px solid var(--border-gold);border-radius:var(--radius-sm);padding:12px;">
+      <div style="font-size:1.4rem;font-weight:900;color:var(--gold);">${targetCals}</div>
+      <div style="font-size:0.7rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;">kcal/day</div>
+    </div>
+    <div style="background:var(--bg-3);border:1px solid var(--border-gold);border-radius:var(--radius-sm);padding:12px;">
+      <div style="font-size:1.4rem;font-weight:900;color:var(--gold);">${protein}g</div>
+      <div style="font-size:0.7rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;">Protein</div>
+    </div>
+    <div style="background:var(--bg-3);border:1px solid var(--border-gold);border-radius:var(--radius-sm);padding:12px;">
+      <div style="font-size:1.4rem;font-weight:900;color:var(--gold);">${days}x</div>
+      <div style="font-size:0.7rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;">Days/wk</div>
+    </div>
+  `;
+  const quotes = [
+    '"The only bad workout is the one that didn\'t happen." — Unknown',
+    '"Success is the sum of small efforts repeated day in and day out." — Robert Collier',
+    '"You don\'t find willpower. You build it." — Unknown',
+    '"Your body can stand almost anything. It\'s your mind you have to convince." — Unknown',
+    '"The secret to getting ahead is getting started." — Mark Twain'
+  ];
+  document.getElementById('motivationalQuote').textContent = quotes[Math.floor(Math.random() * quotes.length)];
+}
+
+function goToDashboard() { window.location.href = 'app.html'; }
+
+// ===== TOAST =====
+function toast(type, msg) {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${{success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'}[type]||'ℹ️'}</span><span>${msg}</span>`;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(() => { t.classList.add('removing'); setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+// ===== INIT =====
+renderDots();
+showStep();
+
+// Keyboard nav
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && currentStep < TOTAL_STEPS) nextStep();
+  if (e.key === 'ArrowLeft' && currentStep > 1) prevStep();
+  if (e.key === 'ArrowRight' && currentStep < TOTAL_STEPS) nextStep();
+});
+</script>
+</body>
+</html>
